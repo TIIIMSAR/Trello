@@ -6,5 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Workspace extends Model
 {
-    protected $fillable = [];
+    protected $guarded = [
+        'id'
+    ];
+    protected static function newFactory()
+    {
+        //return FolderFactory::new();
+    }
 }

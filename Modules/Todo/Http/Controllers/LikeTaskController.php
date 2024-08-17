@@ -3,77 +3,26 @@
 namespace Modules\Todo\Http\Controllers;
 
 use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Modules\Todo\Entities\Task;
 
 class LikeTaskController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     * @return Renderable
+     * Toggle the like for a task.
      */
-    public function index()
+    public function index(Task $task)
     {
-        return view('todo::index');
-    }
+        try {
+            $task->likes()->toggle([auth()->user()->id]);
 
-    /**
-     * Show the form for creating a new resource.
-     * @return Renderable
-     */
-    public function create()
-    {
-        return view('todo::create');
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     * @param Request $request
-     * @return Renderable
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Show the specified resource.
-     * @param int $id
-     * @return Renderable
-     */
-    public function show($id)
-    {
-        return view('todo::show');
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     * @param int $id
-     * @return Renderable
-     */
-    public function edit($id)
-    {
-        return view('todo::edit');
-    }
-
-    /**
-     * Update the specified resource in storage.
-     * @param Request $request
-     * @param int $id
-     * @return Renderable
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     * @param int $id
-     * @return Renderable
-     */
-    public function destroy($id)
-    {
-        //
+            return $this->respondSuccess('لایک با موفقیت تغییر کرد', ['likes_count' => $task->likes()->count()]);
+        } catch (ModelNotFoundException $e) {
+            return $this->respondNotFound('تسک مورد نظر یافت نشد');
+        } catch (\Exception $e) {
+            return $this->respondInternalError('خطایی در تغییر وضعیت لایک رخ داده است');
+        }
     }
 }

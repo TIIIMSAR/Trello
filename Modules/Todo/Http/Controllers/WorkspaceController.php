@@ -3,77 +3,95 @@
 namespace Modules\Todo\Http\Controllers;
 
 use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Modules\Todo\Entities\Workspace;
+use Modules\Todo\Http\Requests\Folder\CreateWorkspaceRequst;
+use Modules\Todo\Http\Requests\Folder\UpdateWorkspaceRequset;
 
 class WorkspaceController extends Controller
 {
     /**
      * Display a listing of the resource.
-     * @return Renderable
      */
-    public function index()
+    public function index(Request $request)
     {
-        return view('todo::index');
-    }
+        try {
+            $paginate = $request->input('paginate') ?? 10;
+            $sortColumn = $request->input('sort', 'id');
+            $sortDirection = \Illuminate\Support\Str::startsWith($sortColumn, '-') ? 'desc' : 'asc';
+            $sortColumn = ltrim($sortColumn, '-');
 
-    /**
-     * Show the form for creating a new resource.
-     * @return Renderable
-     */
-    public function create()
-    {
-        return view('todo::create');
+            $folders = Workspace::orderBy($sortColumn, $sortDirection)->simplePaginate($paginate);
+            return $this->respondSuccess('لیست پوشه‌ها با موفقیت دریافت شد', $folders);
+        } catch (\Exception $e) {
+            return $this->respondInternalError('خطایی در دریافت لیست پوشه‌ها رخ داده است');
+        }
     }
 
     /**
      * Store a newly created resource in storage.
-     * @param Request $request
-     * @return Renderable
      */
-    public function store(Request $request)
+    public function store(CreateWorkspaceRequst $request)
     {
-        //
+        try {
+            $validated = $request->validated();
+            $folder = Workspace::create($validated);
+
+            return $this->respondCreated('پوشه با موفقیت ساخته شد', ['title' => $folder['title']]);
+        } catch (\Exception $e) {
+            return $this->respondInternalError('خطایی در ایجاد پوشه رخ داده است');
+        }
     }
 
     /**
      * Show the specified resource.
-     * @param int $id
-     * @return Renderable
      */
     public function show($id)
     {
-        return view('todo::show');
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     * @param int $id
-     * @return Renderable
-     */
-    public function edit($id)
-    {
-        return view('todo::edit');
+        try {
+            $folder = Workspace::findOrFail($id);
+            return $this->respondSuccess('پوشه با موفقیت پیدا شد', $folder);
+        } catch (ModelNotFoundException $e) {
+            return $this->respondNotFound('پوشه مورد نظر یافت نشد');
+        } catch (\Exception $e) {
+            return $this->respondInternalError('خطایی در نمایش اطلاعات پوشه رخ داده است');
+        }
     }
 
     /**
      * Update the specified resource in storage.
-     * @param Request $request
-     * @param int $id
-     * @return Renderable
      */
-    public function update(Request $request, $id)
+    public function update(UpdateWorkspaceRequset $request, $id)
     {
-        //
+        try {
+            $validated = $request->validated();
+            $folder = Workspace::findOrFail($id);
+            $folder->update($validated);
+
+            return $this->respondSuccess('پوشه با موفقیت به‌روزرسانی شد', ['title' => $folder['title']]);
+        } catch (ModelNotFoundException $e) {
+            return $this->respondNotFound('پوشه مورد نظر برای به‌روزرسانی یافت نشد');
+        } catch (\Exception $e) {
+            return $this->respondInternalError('خطایی در به‌روزرسانی پوشه رخ داده است');
+        }
     }
 
     /**
      * Remove the specified resource from storage.
-     * @param int $id
-     * @return Renderable
      */
     public function destroy($id)
     {
-        //
+        try {
+            $folder = Workspace::findOrFail($id);
+            $folder->delete();
+
+            return $this->respondSuccess('پوشه با موفقیت پاک شد', null);
+        } catch (ModelNotFoundException $e) {
+            return $this->respondNotFound('پوشه مورد نظر برای حذف یافت نشد');
+        } catch (\Exception $e) {
+            return $this->respondInternalError('خطایی در حذف پوشه رخ داده است');
+        }
     }
 }

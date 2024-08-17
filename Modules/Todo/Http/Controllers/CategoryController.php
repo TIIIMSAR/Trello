@@ -3,77 +3,95 @@
 namespace Modules\Todo\Http\Controllers;
 
 use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Modules\Todo\Entities\Category;
+use Modules\Todo\Http\Requests\Category\CreateCategoryRequset;
+use Modules\Todo\Http\Requests\Category\UpdateCategotyRequset;
 
 class CategoryController extends Controller
 {
-    /**
+   /**
      * Display a listing of the resource.
-     * @return Renderable
      */
-    public function index()
+    public function index(\Illuminate\Http\Request $request)
     {
-        return view('todo::index');
-    }
+        // try {
+            $paginate = $request->input('paginate') ?? 10;
+            $sortColumn = $request->input('sort', 'id');
+            $sortDirection = \Illuminate\Support\Str::startsWith($sortColumn, '-') ? 'desc' : 'asc';
+            $sortColumn = ltrim($sortColumn, '-');
 
-    /**
-     * Show the form for creating a new resource.
-     * @return Renderable
-     */
-    public function create()
-    {
-        return view('todo::create');
+            $categories = Category::with('tasks')->orderBy($sortColumn, $sortDirection)->simplePaginate($paginate);
+            return $this->respondSuccess('لیست دسته‌بندی‌ها با موفقیت دریافت شد', $categories);
+        // } catch (\Exception $e) {
+        //     return $this->respondInternalError('خطایی در دریافت لیست دسته‌بندی‌ها رخ داده است');
+        // }
     }
 
     /**
      * Store a newly created resource in storage.
-     * @param Request $request
-     * @return Renderable
      */
-    public function store(Request $request)
+    public function store(CreateCategoryRequset $request)
     {
-        //
+        try {
+            $validated = $request->validated();
+            $category = Category::create($validated);
+
+            return $this->respondCreated('دسته‌بندی با موفقیت ساخته شد', ['slug' => $category['slug']]);
+        } catch (\Exception $e) {
+            return $this->respondInternalError('خطایی در ایجاد دسته‌بندی رخ داده است');
+        }
     }
 
     /**
      * Show the specified resource.
-     * @param int $id
-     * @return Renderable
      */
     public function show($id)
     {
-        return view('todo::show');
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     * @param int $id
-     * @return Renderable
-     */
-    public function edit($id)
-    {
-        return view('todo::edit');
+        try {
+            $category = Category::findOrFail($id);
+            return $this->respondSuccess('دسته‌بندی با موفقیت پیدا شد', $category);
+        } catch (ModelNotFoundException $e) {
+            return $this->respondNotFound('دسته‌بندی مورد نظر یافت نشد');
+        } catch (\Exception $e) {
+            return $this->respondInternalError('خطایی در نمایش اطلاعات دسته‌بندی رخ داده است');
+        }
     }
 
     /**
      * Update the specified resource in storage.
-     * @param Request $request
-     * @param int $id
-     * @return Renderable
      */
-    public function update(Request $request, $id)
+    public function update(UpdateCategotyRequset $request, $id)
     {
-        //
+        try {
+            $validated = $request->validated();
+            $category = Category::findOrFail($id);
+            $category->update($validated);
+
+            return $this->respondSuccess('دسته‌بندی با موفقیت به‌روزرسانی شد', ['slug' => $category['slug']]);
+        } catch (ModelNotFoundException $e) {
+            return $this->respondNotFound('دسته‌بندی مورد نظر برای به‌روزرسانی یافت نشد');
+        } catch (\Exception $e) {
+            return $this->respondInternalError('خطایی در به‌روزرسانی دسته‌بندی رخ داده است');
+        }
     }
 
     /**
      * Remove the specified resource from storage.
-     * @param int $id
-     * @return Renderable
      */
     public function destroy($id)
     {
-        //
+        try {
+            $category = Category::findOrFail($id);
+            $category->delete();
+
+            return $this->respondSuccess('دسته‌بندی با موفقیت حذف شد', null);
+        } catch (ModelNotFoundException $e) {
+            return $this->respondNotFound('دسته‌بندی مورد نظر برای حذف یافت نشد');
+        } catch (\Exception $e) {
+            return $this->respondInternalError('خطایی در حذف دسته‌بندی رخ داده است');
+        }
     }
 }
