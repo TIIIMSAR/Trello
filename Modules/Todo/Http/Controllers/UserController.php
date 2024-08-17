@@ -2,20 +2,21 @@
 
 namespace Modules\Todo\Http\Controllers;
 
-use App\Models\User;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Modules\Todo\Entities\User;
 use Modules\Todo\Http\Controllers\Contract\ApiController;
 use Modules\Todo\Http\Requests\User\CreateUserRequset;
 use Modules\Todo\Http\Requests\User\UpdateUserRequset;
 
 class UserController extends ApiController
 {
-     /**
+     /**    
          * Display a listing of the resource.
          */
         public function index(Request $request)
@@ -32,37 +33,6 @@ class UserController extends ApiController
                 return $this->respondInternalError('خطایی در دریافت لیست کاربران رخ داده است');
             }
         }
-
-        /**
-         * Store a newly created resource in storage.
-         */
-        public function store(CreateUserRequset $request)
-    {
-        // $file  = $request->file('image');
-        //     if(!empty($file)){
-        //         $image_naem = time() . '.' . $file->getClientOriginalExtension();
-        //         $file->move('images/UserProfile', $image_naem);
-        //     }
-
-        // try{
-            $validated = $request->validated();
-
-            $validated['password'] = Hash::make($request->password);
-
-            // $validated['image'] = $image_naem;
-                
-            $user = User::create($validated);
-            
-            $token = auth('api')->login($user);
-
-            return $this->respondCreated('کاربر با موفقیت ایجاد شد', [
-                'user' => $user,
-                'token' => $token,
-            ]);
-        // } catch (\Exception $e) {
-        //     return $this->respondInternalError('(ایمیل باید یونیک باشد):خطایی در ایجاد کاربر رخ داده است');
-        // }
-    }
 
         /**
          * Show the specified resource.

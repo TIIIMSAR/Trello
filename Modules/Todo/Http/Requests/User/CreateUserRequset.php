@@ -14,7 +14,10 @@ class CreateUserRequset extends FormRequest
     public function rules()
     {
         return [
-            //
+            'name' => ['required', 'string', 'min:3', 'max:256'],
+            'email' => ['required', 'email'],
+            'image_path' => ['nullable', 'file', 'mimes:jpg,jpeg,png,gif'],
+            'password' => ['required', 'min:3'],
         ];
     }
 

@@ -1,5 +1,8 @@
 <?php
 
+use App\Models\User;
+
+
 return [
 
     /*
@@ -14,7 +17,7 @@ return [
     */
 
     'defaults' => [
-        'guard' => 'web',
+        'guard' => 'api',
         'passwords' => 'users',
     ],
 
@@ -40,6 +43,12 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+
+        'api' => [
+            'driver' => 'token',
+            'provider' => 'users',
+        ]
     ],
 
     /*
@@ -62,7 +71,7 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => App\Models\User::class,
+            'model' => \Modules\Todo\Entities\User::class,
         ],
 
         // 'users' => [
