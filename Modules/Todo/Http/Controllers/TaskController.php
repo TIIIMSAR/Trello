@@ -3,77 +3,99 @@
 namespace Modules\Todo\Http\Controllers;
 
 use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Str;
+use Modules\Todo\Entities\Task;
+use Modules\Todo\Http\Requests\Task\CreateTaskRequst;
+use Modules\Todo\Http\Requests\Task\UpdateTaskRequst;
 
 class TaskController extends Controller
 {
-    /**
+      /**
      * Display a listing of the resource.
-     * @return Renderable
      */
-    public function index()
+    public function index(Request $request)
     {
-        return view('todo::index');
-    }
 
-    /**
-     * Show the form for creating a new resource.
-     * @return Renderable
-     */
-    public function create()
-    {
-        return view('todo::create');
+        // $task = Task::find(36);
+        // dd($task->categories);
+        try {
+            $paginate = $request->input('paginate') ?? 10;
+            $sortColumn = $request->input('sort', 'id');
+            $sortDirection = Str::startsWith($sortColumn, '-') ? 'desc' : 'asc';
+            $sortColumn = ltrim($sortColumn, '-');
+
+            $tasks = Task::with('categories')->orderBy($sortColumn, $sortDirection)->simplePaginate($paginate);
+            return $this->respondSuccess('لیست تسک‌ها با موفقیت دریافت شد', $tasks);
+        } catch (\Exception $e) {
+            return $this->respondInternalError('خطایی در دریافت لیست تسک‌ها رخ داده است');
+        }
     }
 
     /**
      * Store a newly created resource in storage.
-     * @param Request $request
-     * @return Renderable
      */
-    public function store(Request $request)
+    public function store(CreateTaskRequst $request)
     {
-        //
+        // try {
+            $validated = $request->validated();
+            $task = Task::create($validated);
+
+            return $this->respondCreated('تسک با موفقیت ایجاد شد', $task);
+        // } catch (\Exception $e) {
+        //     return $this->respondInternalError('خطایی در ایجاد تسک رخ داده است');
+        // }
     }
 
     /**
      * Show the specified resource.
-     * @param int $id
-     * @return Renderable
      */
     public function show($id)
     {
-        return view('todo::show');
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     * @param int $id
-     * @return Renderable
-     */
-    public function edit($id)
-    {
-        return view('todo::edit');
+        try {
+            $task = Task::with('categores')->findOrFail($id);
+            return $this->respondSuccess('تسک با موفقیت پیدا شد', $task);
+        } catch (ModelNotFoundException $e) {
+            return $this->respondNotFound('تسک مورد نظر یافت نشد');
+        } catch (\Exception $e) {
+            return $this->respondInternalError('خطایی در نمایش اطلاعات تسک رخ داده است');
+        }
     }
 
     /**
      * Update the specified resource in storage.
-     * @param Request $request
-     * @param int $id
-     * @return Renderable
      */
-    public function update(Request $request, $id)
+    public function update(UpdateTaskRequst $request, $id)
     {
-        //
+        try {
+            $validated = $request->validated();
+            $task = Task::findOrFail($id);
+            $task->update($validated);
+
+            return $this->respondSuccess('تسک با موفقیت به‌روزرسانی شد', $task);
+        } catch (ModelNotFoundException $e) {
+            return $this->respondNotFound('تسک مورد نظر برای به‌روزرسانی یافت نشد');
+        } catch (\Exception $e) {
+            return $this->respondInternalError('خطایی در به‌روزرسانی تسک رخ داده است');
+        }
     }
 
     /**
      * Remove the specified resource from storage.
-     * @param int $id
-     * @return Renderable
      */
     public function destroy($id)
     {
-        //
+        try {
+            $task = Task::findOrFail($id);
+            $task->delete();
+
+            return $this->respondSuccess('تسک با موفقیت حذف شد', null);
+        } catch (ModelNotFoundException $e) {
+            return $this->respondNotFound('تسک مورد نظر برای حذف یافت نشد');
+        } catch (\Exception $e) {
+            return $this->respondInternalError('خطایی در حذف تسک رخ داده است');
+        }
     }
 }

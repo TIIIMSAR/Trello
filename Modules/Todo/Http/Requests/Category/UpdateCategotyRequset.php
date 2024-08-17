@@ -12,8 +12,9 @@ class UpdateCategotyRequset extends FormRequest
     public function rules(): array
     {
         return [
-            'slug' => ['required', 'min:3', 'string'],
-            'category_id' => ['required',]
+            'name' => ['required', 'string', 'min:3'],
+            'category_id' => ['nullable',],
+            'user_id' => ['required'],
         ];
     }
 

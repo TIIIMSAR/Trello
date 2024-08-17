@@ -17,7 +17,7 @@ class CreateTasksTable extends Migration
             $table->id();
             $table->string('title');    
             $table->string('body');
-            $table->smallInteger('status');
+            $table->smallInteger('status')->default(0);
             
             $table->foreignId('user_id')
             ->constrained()

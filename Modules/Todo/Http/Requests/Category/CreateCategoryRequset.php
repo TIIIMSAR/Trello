@@ -12,8 +12,9 @@ class CreateCategoryRequset extends FormRequest
     public function rules(): array
     {
         return [
-            'slug' => ['required', 'string', 'min:3'],
-            'category_id' => ['nullable',]
+            'name' => ['required', 'string', 'min:3'],
+            'category_id' => ['nullable',],
+            'user_id' => ['required'],
         ];
     }
 

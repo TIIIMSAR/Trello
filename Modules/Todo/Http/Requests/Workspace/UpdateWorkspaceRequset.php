@@ -4,7 +4,7 @@ namespace Modules\Todo\Http\Requests\Folder;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateFolderRequset extends FormRequest
+class UpdateWorkspaceRequset extends FormRequest
 {
     /**
      * Get the validation rules that apply to the request.
@@ -12,8 +12,9 @@ class UpdateFolderRequset extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => ['required', 'string', 'max:120', 'min:3'],
-            'user_id' => ['required']
+            'name' => ['required', 'string', 'max:120', 'min:3'],
+            'user_id' => ['required'],
+            'categoey_id' => ['required']
         ];
     }
 
