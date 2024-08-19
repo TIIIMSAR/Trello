@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddCategoryIdInWorkspaceTable extends Migration
+class AddCategoryIdInTasksTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class AddCategoryIdInWorkspaceTable extends Migration
      */
     public function up()
     {
-        Schema::table('workspaces', function (Blueprint $table) {
-            $table->foreignId('category_id')->after('user_id')
+        Schema::table('tasks', function (Blueprint $table) {
+            $table->foreignId('category_id')->after('title')
             ->constrained()
             ->onDelete('cascade')
             ->onUpdate('cascade');
@@ -28,7 +28,7 @@ class AddCategoryIdInWorkspaceTable extends Migration
      */
     public function down()
     {
-        Schema::table('workspaces', function (Blueprint $table) {
+        Schema::table('', function (Blueprint $table) {
 
         });
     }

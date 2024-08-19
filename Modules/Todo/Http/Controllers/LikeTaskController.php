@@ -19,7 +19,7 @@ class LikeTaskController extends ApiController
      */
     public function index(Request $request)
     {
-        // try {
+        try {
             $workspaceId = $request->header('workspace_id');
     
             if (!$workspaceId) {
@@ -32,7 +32,7 @@ class LikeTaskController extends ApiController
                 return $this->respondNotFound('هیچ دسته‌بندی‌ای برای workspace_id مشخص شده پیدا نشد');
             }
 
-            $user = Workspace::whereIn('category_id', $categories)->get();
+            $user = Workspace::whereIn('user_id', $categories)->get();
     
             if ($user->isEmpty()) {
                 return $this->respondNotFound('هیچ تسکی برای دسته‌بندی‌های مشخص شده پیدا نشد');
@@ -48,9 +48,9 @@ class LikeTaskController extends ApiController
             });
     
             return $this->respondSuccess('لایک‌ها با موفقیت تغییر کرد', ['likes_count' => $likesCount]);
-        // } catch (\Exception $e) {
-        //     return $this->respondInternalError('خطایی در تغییر وضعیت لایک رخ داده است');
-        // }
+        } catch (\Exception $e) {
+            return $this->respondInternalError('خطایی در تغییر وضعیت لایک رخ داده است');
+        }
         
     }
 }
