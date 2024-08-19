@@ -54,8 +54,17 @@ class UserController extends ApiController
          */
         public function update(UpdateUserRequset $request, $id)
         {
+            // $file =  $request->file('image_path');
+            //     if(!empty($file)){
+            //         $image_naem = time() . rand(100,10000) . '.' . $file->getClientOriginalExtension();
+            //         $file->move('images/UserProfile', $image_naem);
+            //         $validated['image_path'] = $image_naem;
+            // }
+            
             try {
                 $validated = $request->validated();
+                
+
                 $user = User::findOrFail($id);
                 $user->update($validated);
 

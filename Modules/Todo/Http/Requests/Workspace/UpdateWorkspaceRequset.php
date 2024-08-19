@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Todo\Http\Requests\Folder;
+namespace Modules\Todo\Http\Requests\Workspace;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -13,8 +13,8 @@ class UpdateWorkspaceRequset extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:120', 'min:3'],
-            'user_id' => ['required'],
-            'categoey_id' => ['required']
+            'user_id' => ['nullable'],
+            'categoey_id' => ['nullable']
         ];
     }
 

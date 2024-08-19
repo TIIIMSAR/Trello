@@ -16,22 +16,21 @@ use Modules\Todo\Http\Requests\User\UpdateUserRequset;
 
 class AuthController extends ApiController
 {
-      public function register(Request $request)
+      public function register(CreateUserRequset $request)
       {
          $file =  $request->file('image_path');
                     if(!empty($file)){
-                        $image_naem = time() . '.' . $file->getClientOriginalExtension();
+                        $image_naem = time() . rand(100,10000) . '.' . $file->getClientOriginalExtension();
                         $file->move('images/UserProfile', $image_naem);
+                        $validated['image'] = $image_naem;
                     }
-            try{
-
+            try{    
                 $request['password'] = Hash::make($request->password);
-                $validated['image'] = $image_naem;
                     
                 $user = User::create([
                     'name' => $request['name'],
                     'email' => $request['email'],
-                    'password' => bcrypt($request['password']),
+                    'password' => $request['password'],
                 ]);
                     
                 $token = $user->createToken('Personal Access Token')->plainTextToken;
@@ -47,28 +46,33 @@ class AuthController extends ApiController
 
 
       public function login(Request $request)
-      {
-          $validator = Validator::make($request->all(), [
-              'email' => 'required|string|email',
-              'password' => 'required|string',
-          ]);
-  
-          if ($validator->fails()) {
-              return response()->json(['errors' => $validator->errors()], 422);
-          }
-  
-          if (!Auth::attempt($request->only('email', 'password'))) {
-              return response()->json(['message' => 'اطلاعات ورود اشتباه است'], 401);
-          }
-  
-          $user = User::where('email', $request->email)->first();
-  
-          $token = $user->createToken('Personal Access Token')->plainTextToken;
-  
-          return response()->json([
-              'message' => 'ورود موفقیت‌آمیز',
-              'user' => $user,
-              'token' => $token,
-          ]);
-      }
+{
+    // اعتبارسنجی ورودی‌ها
+    $validator = Validator::make($request->all(), [
+        'email' => 'required|string|email',
+        'password' => 'required|string',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 422);
+    }
+
+    // پیدا کردن کاربر بر اساس ایمیل
+    $user = User::where('email', $request->email)->first();
+
+    // بررسی صحت پسورد
+    if (!$user || !Hash::check($request->password, $user->password)) {
+        return response()->json(['message' => 'اطلاعات ورود اشتباه است'], 401);
+    }
+
+    // ایجاد توکن دسترسی
+    $token = $user->createToken('Personal Access Token')->plainTextToken;
+
+    // بازگرداندن پاسخ با توکن و اطلاعات کاربر
+    return response()->json([
+        'message' => 'ورود موفقیت‌آمیز',
+        'user' => $user,
+        'token' => $token,
+    ]);
+}
   }

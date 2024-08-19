@@ -16,7 +16,7 @@ class CreateLikeTable extends Migration
         Schema::create('like', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('task_id')
+            $table->foreignId('user_id')
             ->constrained()
             ->onDelete('cascade')
             ->onUpdate('cascade');

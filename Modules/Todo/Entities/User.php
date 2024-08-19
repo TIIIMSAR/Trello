@@ -33,6 +33,13 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    function likes()
+    {
+        return $this->belongsToMany(Workspace::class, 'likes');
+    }
+
+
+
     /**
      * The attributes that should be cast.
      *

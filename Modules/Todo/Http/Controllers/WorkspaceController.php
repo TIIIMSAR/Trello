@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Modules\Todo\Entities\Workspace;
-use Modules\Todo\Http\Requests\Folder\CreateWorkspaceRequst;
-use Modules\Todo\Http\Requests\Folder\UpdateWorkspaceRequset;
+use Modules\Todo\Http\Controllers\Contract\ApiController;
+use Modules\Todo\Http\Requests\Workspace\CreateWorkspaceRequst;
+use Modules\Todo\Http\Requests\Workspace\UpdateWorkspaceRequset;
 
-class WorkspaceController extends Controller
+class WorkspaceController extends ApiController
 {
     /**
      * Display a listing of the resource.
@@ -39,7 +40,7 @@ class WorkspaceController extends Controller
             $validated = $request->validated();
             $folder = Workspace::create($validated);
 
-            return $this->respondCreated('پوشه با موفقیت ساخته شد', ['title' => $folder['title']]);
+            return $this->respondCreated('پوشه با موفقیت ساخته شد', ['name' => $folder['name']]);
         } catch (\Exception $e) {
             return $this->respondInternalError('خطایی در ایجاد پوشه رخ داده است');
         }
@@ -63,14 +64,14 @@ class WorkspaceController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateWorkspaceRequset $request, $id)
+public function update(UpdateWorkspaceRequset $request, $id)
     {
         try {
             $validated = $request->validated();
             $folder = Workspace::findOrFail($id);
             $folder->update($validated);
 
-            return $this->respondSuccess('پوشه با موفقیت به‌روزرسانی شد', ['title' => $folder['title']]);
+            return $this->respondSuccess('پوشه با موفقیت به‌روزرسانی شد', ['name' => $folder['name']]);
         } catch (ModelNotFoundException $e) {
             return $this->respondNotFound('پوشه مورد نظر برای به‌روزرسانی یافت نشد');
         } catch (\Exception $e) {

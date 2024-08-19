@@ -8,26 +8,27 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Str;
 use Modules\Todo\Entities\Task;
+use Modules\Todo\Http\Controllers\Contract\ApiController;
 use Modules\Todo\Http\Requests\Task\CreateTaskRequst;
 use Modules\Todo\Http\Requests\Task\UpdateTaskRequst;
 
-class TaskController extends Controller
+class TaskController extends ApiController
 {
       /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-
-        // $task = Task::find(36);
-        // dd($task->categories);
         try {
             $paginate = $request->input('paginate') ?? 10;
             $sortColumn = $request->input('sort', 'id');
             $sortDirection = Str::startsWith($sortColumn, '-') ? 'desc' : 'asc';
             $sortColumn = ltrim($sortColumn, '-');
 
-            $tasks = Task::with('categories')->orderBy($sortColumn, $sortDirection)->simplePaginate($paginate);
+            $tasks = Task::orderBy($sortColumn, $sortDirection)->simplePaginate($paginate);
+            {
+                // return $this->belongsTo(Task::class);
+            }
             return $this->respondSuccess('لیست تسک‌ها با موفقیت دریافت شد', $tasks);
         } catch (\Exception $e) {
             return $this->respondInternalError('خطایی در دریافت لیست تسک‌ها رخ داده است');
@@ -55,7 +56,7 @@ class TaskController extends Controller
     public function show($id)
     {
         try {
-            $task = Task::with('categores')->findOrFail($id);
+            $task = Task::findOrFail($id);
             return $this->respondSuccess('تسک با موفقیت پیدا شد', $task);
         } catch (ModelNotFoundException $e) {
             return $this->respondNotFound('تسک مورد نظر یافت نشد');
@@ -97,5 +98,10 @@ class TaskController extends Controller
         } catch (\Exception $e) {
             return $this->respondInternalError('خطایی در حذف تسک رخ داده است');
         }
+    }
+
+    public function fallback()
+    {
+        return $this->respondNotFound('لطفا ادرس را درست وارد بفرمایید ');
     }
 }

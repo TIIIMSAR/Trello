@@ -7,8 +7,9 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Modules\Todo\Entities\Task;
+use Modules\Todo\Http\Controllers\Contract\ApiController;
 
-class SearchController extends Controller
+class SearchController extends ApiController
 {
     /**
      * Display a listing of the resource.

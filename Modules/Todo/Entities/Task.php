@@ -14,9 +14,9 @@ class Task extends Model
     ];
 
 
-    public function likes()
+    public function category()
     {
-        return $this->belongsToMany(User::class, 'likes');
+        return $this->belongsTo(Category::class, 'like');
     }
 
     public function getIsUserLikedAttribute()
@@ -24,10 +24,10 @@ class Task extends Model
         return $this->likes()->where('user_id', $this->user()->id)->exists();
     }
 
-    public function categories()
-    {
-        return $this->belongsToMany(Category::class, 'category_tasks');
-    }
+    // public function categories()
+    // {
+    //     return $this->belongsToMany(Category::class, 'category_tasks');
+    // }
 
     protected static function newFactory()
     {

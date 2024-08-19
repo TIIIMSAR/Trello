@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Todo\Http\Requests\Folder;
+namespace Modules\Todo\Http\Requests\Workspace;
 
 use Illuminate\Foundation\Http\FormRequest;
 

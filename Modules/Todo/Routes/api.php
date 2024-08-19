@@ -2,13 +2,17 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Modules\Todo\Entities\User;
 use Modules\Todo\Http\Controllers\AuthController;
 use Modules\Todo\Http\Controllers\CategoryController;
 use Modules\Todo\Http\Controllers\LikeTaskController;
+use Modules\Todo\Http\Controllers\PasswordResetController;
 use Modules\Todo\Http\Controllers\SearchController;
 use Modules\Todo\Http\Controllers\TaskController;
 use Modules\Todo\Http\Controllers\UserController;
 use Modules\Todo\Http\Controllers\WorkspaceController;
+
+
 
 
 
@@ -24,10 +28,12 @@ use Modules\Todo\Http\Controllers\WorkspaceController;
 */
     Route::fallback([TaskController::class, 'fallback']);
     Route::get('/search', [SearchController::class, 'index']);
-    Route::post('like/{task:title}', [LikeTaskController::class, 'index']); 
+    Route::post('like/{workspace:name}', [LikeTaskController::class, 'index']); 
 
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/password/email', [PasswordResetController::class, 'sendResetLinkEmail']);
+    Route::post('/password/reset', [PasswordResetController::class, 'resetPassword']);
 
     Route::group(['prefix' => '/users'], function () {
         Route::get('', [UserController::class, 'index']);

@@ -15,8 +15,8 @@ class UpdateTaskRequst extends FormRequest
             'title' => ['nullable', 'string', 'min:3', 'max:120'],
             'body' => ['nullable', 'string', 'min:3', 'max:1024'],
             'status' => ['nullable'],
-            'user_id' => ['required', 'integer'],
-            'category_id' => ['required', 'integer']
+            'user_id' => ['nullable', 'integer'],
+            'category_id' => ['nullable', 'integer']
         ];
     }
 

@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Modules\Todo\Entities\Category;
+use Modules\Todo\Http\Controllers\Contract\ApiController;
 use Modules\Todo\Http\Requests\Category\CreateCategoryRequset;
 use Modules\Todo\Http\Requests\Category\UpdateCategotyRequset;
 
-class CategoryController extends Controller
+class CategoryController extends ApiController
 {
    /**
      * Display a listing of the resource.
@@ -35,14 +36,14 @@ class CategoryController extends Controller
      */
     public function store(CreateCategoryRequset $request)
     {
-        try {
+        // try {
             $validated = $request->validated();
             $category = Category::create($validated);
 
-            return $this->respondCreated('دسته‌بندی با موفقیت ساخته شد', ['slug' => $category['slug']]);
-        } catch (\Exception $e) {
-            return $this->respondInternalError('خطایی در ایجاد دسته‌بندی رخ داده است');
-        }
+            return $this->respondCreated('دسته‌بندی با موفقیت ساخته شد', ['name' => $category['name']]);
+        // } catch (\Exception $e) {
+        //     return $this->respondInternalError('خطایی در ایجاد دسته‌بندی رخ داده است');
+        // }
     }
 
     /**
