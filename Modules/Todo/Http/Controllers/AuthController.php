@@ -4,6 +4,7 @@ namespace Modules\Todo\Http\Controllers;
 
 use CreateUsersTable;
 use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -47,7 +48,6 @@ class AuthController extends ApiController
 
       public function login(Request $request)
 {
-    // اعتبارسنجی ورودی‌ها
     $validator = Validator::make($request->all(), [
         'email' => 'required|string|email',
         'password' => 'required|string',
@@ -57,22 +57,35 @@ class AuthController extends ApiController
         return response()->json(['errors' => $validator->errors()], 422);
     }
 
-    // پیدا کردن کاربر بر اساس ایمیل
     $user = User::where('email', $request->email)->first();
 
-    // بررسی صحت پسورد
     if (!$user || !Hash::check($request->password, $user->password)) {
         return response()->json(['message' => 'اطلاعات ورود اشتباه است'], 401);
     }
 
-    // ایجاد توکن دسترسی
     $token = $user->createToken('Personal Access Token')->plainTextToken;
 
-    // بازگرداندن پاسخ با توکن و اطلاعات کاربر
     return response()->json([
         'message' => 'ورود موفقیت‌آمیز',
         'user' => $user,
         'token' => $token,
     ]);
 }
-  }
+
+    public function logout($id)
+    {
+        try {
+            $user = User::findOrFail($id);
+            $user->tokens()->delete();
+            $user->delete();
+
+            return $this->respondSuccess('کاربر با موفقیت حذف شد', null);
+        } catch (ModelNotFoundException $e) {
+            return $this->respondNotFound('کاربر مورد نظر برای حذف یافت نشد');
+        } catch (\Exception $e) {
+            return $this->respondInternalError('خطایی در حذف کاربر رخ داده است');
+        }
+    }
+
+
+}

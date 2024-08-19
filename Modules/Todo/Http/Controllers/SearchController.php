@@ -16,6 +16,7 @@ class SearchController extends ApiController
      */
     public function index(Request $request)
     {
+        // dd($request->all());
         try {
             $query = Task::where('title', 'LIKE', "%{$request->search}%");
             $results = $query->simplePaginate(10);

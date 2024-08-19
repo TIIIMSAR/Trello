@@ -32,6 +32,8 @@ use Modules\Todo\Http\Controllers\WorkspaceController;
 
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
+    Route::delete('/logout/{id}', [AuthController::class, 'logout']);
+
     Route::post('/password/email', [PasswordResetController::class, 'sendResetLinkEmail']);
     Route::post('/password/reset', [PasswordResetController::class, 'resetPassword']);
 
@@ -39,7 +41,6 @@ use Modules\Todo\Http\Controllers\WorkspaceController;
         Route::get('', [UserController::class, 'index']);
         Route::get('/{id}', [UserController::class, 'show']);
         Route::put('/{id}', [UserController::class, 'update']);
-        Route::delete('/{id}', [UserController::class, 'destroy']);
     });
 
     Route::group(['prefix' => '/tasks'], function () {

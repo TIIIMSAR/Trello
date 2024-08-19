@@ -53,18 +53,10 @@ class UserController extends ApiController
          * Update the specified resource in storage.
          */
         public function update(UpdateUserRequset $request, $id)
-        {
-            // $file =  $request->file('image_path');
-            //     if(!empty($file)){
-            //         $image_naem = time() . rand(100,10000) . '.' . $file->getClientOriginalExtension();
-            //         $file->move('images/UserProfile', $image_naem);
-            //         $validated['image_path'] = $image_naem;
-            // }
-            
+        {        
             try {
                 $validated = $request->validated();
                 
-
                 $user = User::findOrFail($id);
                 $user->update($validated);
 
@@ -76,20 +68,5 @@ class UserController extends ApiController
             }
         }
 
-        /**
-         * Remove the specified resource from storage.
-         */
-        public function destroy($id)
-        {
-            try {
-                $user = User::findOrFail($id);
-                $user->delete();
 
-                return $this->respondSuccess('کاربر با موفقیت حذف شد', null);
-            } catch (ModelNotFoundException $e) {
-                return $this->respondNotFound('کاربر مورد نظر برای حذف یافت نشد');
-            } catch (\Exception $e) {
-                return $this->respondInternalError('خطایی در حذف کاربر رخ داده است');
-            }
-        }
 }

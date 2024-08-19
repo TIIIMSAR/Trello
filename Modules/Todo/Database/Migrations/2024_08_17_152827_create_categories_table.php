@@ -22,6 +22,11 @@ class CreateCategoriesTable extends Migration
             ->onDelete('cascade')
             ->onUpdate('cascade');
 
+            $table->foreignId('workspace_id')
+            ->constrained()
+            ->onDelete('cascade')
+            ->onUpdate('cascade');
+
             $table->timestamps();
         });
     }

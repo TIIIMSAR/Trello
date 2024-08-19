@@ -36,6 +36,7 @@ class CategoryController extends ApiController
      */
     public function store(CreateCategoryRequset $request)
     {
+        
         // try {
             $validated = $request->validated();
             $category = Category::create($validated);

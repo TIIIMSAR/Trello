@@ -19,7 +19,7 @@ class TaskController extends ApiController
      */
     public function index(Request $request)
     {
-        try {
+        // try {
             $paginate = $request->input('paginate') ?? 10;
             $sortColumn = $request->input('sort', 'id');
             $sortDirection = Str::startsWith($sortColumn, '-') ? 'desc' : 'asc';
@@ -30,9 +30,9 @@ class TaskController extends ApiController
                 // return $this->belongsTo(Task::class);
             }
             return $this->respondSuccess('لیست تسک‌ها با موفقیت دریافت شد', $tasks);
-        } catch (\Exception $e) {
-            return $this->respondInternalError('خطایی در دریافت لیست تسک‌ها رخ داده است');
-        }
+        // } catch (\Exception $e) {
+        //     return $this->respondInternalError('خطایی در دریافت لیست تسک‌ها رخ داده است');
+        // }
     }
 
     /**

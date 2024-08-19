@@ -74,6 +74,15 @@ return [
             'model' => \Modules\Todo\Entities\User::class,
         ],
 
+        
+    'passwords' => [
+        'users' => [
+            'provider' => 'users',
+            'table' => 'password_resets',
+            'expire' => 60,
+    ],
+],
+
         // 'users' => [
         //     'driver' => 'database',
         //     'table' => 'users',

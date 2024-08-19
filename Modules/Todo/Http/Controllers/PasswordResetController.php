@@ -6,14 +6,17 @@ use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Password;    
+use Illuminate\Support\Facades\Validator;
 
 class PasswordResetController extends Controller
 {
     public function sendResetLinkEmail(Request $request)
     {
-        $request->validate(['email' => 'required|email']);
-
+        Validator::make($request->all(), [
+            'email' => 'required|string|email',
+        ]);
+        
         $status = Password::sendResetLink(
             $request->only('email')
         );
@@ -21,7 +24,8 @@ class PasswordResetController extends Controller
         if ($status === Password::RESET_LINK_SENT) {
             return response()->json(['message' => 'لینک بازنشانی رمز عبور به ایمیل شما ارسال شد.'], 200);
         } else {
-            return response()->json(['message' => 'خطایی در ارسال لینک بازنشانی رمز عبور رخ داد.'], 400);
+            $errorMessage = $this->getErrorMessage($status);
+            return response()->json(['message' => $errorMessage], 400);   
         }
     }
 
@@ -52,4 +56,18 @@ class PasswordResetController extends Controller
             return response()->json(['message' => 'خطا در بازنشانی رمز عبور.'], 400);
         }
     }
+
+
+
+    protected function getErrorMessage($status)
+    {
+        $messages = [
+            Password::INVALID_USER => 'کاربری با این ایمیل یافت نشد.',
+            Password::INVALID_TOKEN => 'لینک بازنشانی رمز عبور نادرست است.',
+            Password::RESET_LINK_SENT => 'لینک بازنشانی رمز عبور ارسال شد.',
+        ];
+
+        return $messages[$status] ?? 'خطای ناشناخته.';
+    }
+
 }

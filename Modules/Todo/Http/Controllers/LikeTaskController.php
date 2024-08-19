@@ -13,18 +13,17 @@ use Modules\Todo\Http\Controllers\Contract\ApiController;
 class LikeTaskController extends ApiController
 {
     /**
-     * Toggle the like for a task.
+     * Toggle the like for a task.  
      */
     public function index(Workspace $workspace)
     {
-        // try {
-            $workspace->likes()->toggle(16); //[auth()->user()->id]
-
+        try {
+            $workspace->likes()->toggle([auth()->user()->id]); //[auth()->user()->id]
             return $this->respondSuccess('لایک با موفقیت تغییر کرد', ['likes_count' => $workspace->likes()->count()]);
-        // } catch (ModelNotFoundException $e) {
-        //     return $this->respondNotFound('تسک مورد نظر یافت نشد');
-        // } catch (\Exception $e) {
-        //     return $this->respondInternalError('خطایی در تغییر وضعیت لایک رخ داده است');
-        // }
+        } catch (ModelNotFoundException $e) {
+            return $this->respondNotFound('تسک مورد نظر یافت نشد');
+        } catch (\Exception $e) {
+            return $this->respondInternalError('{Authorization: را وارد کنید}:خطایی در تغییر وضعیت لایک رخ داده است');
+        }
     }
 }
