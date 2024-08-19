@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Modules\Todo\Entities\Task;
+use Modules\Todo\Entities\Workspace;
 use Modules\Todo\Http\Controllers\Contract\ApiController;
 
 class SearchController extends ApiController
@@ -16,15 +17,26 @@ class SearchController extends ApiController
      */
     public function index(Request $request)
     {
-        // dd($request->all());
         try {
-            $query = Task::where('title', 'LIKE', "%{$request->search}%");
-            $results = $query->simplePaginate(10);
-
-            $results->appends(request()->query());
-            return $this->respondSuccess('نتایج جستجو با موفقیت دریافت شد', $results);
-        } catch (ModelNotFoundException $e) {
-            return $this->respondNotFound('هیچ تسکی مطابق با جستجوی شما یافت نشد');
+            $workspaceId = $request->header('workspace_id');
+    
+            $workspace = Workspace::find($workspaceId);
+    
+            if (!$workspace) {
+                return response()->json(['error' => 'فضای کاری مورد نظر یافت نشد'], 404);
+            }
+    
+            $categoryIds = $workspace->categories()->pluck('id');
+            
+            $searchTerm = $request->query('search', '');
+    
+            $tasks = Task::whereIn('category_id', $categoryIds)
+                ->where('title', 'LIKE', "%{$searchTerm}%")
+                ->simplePaginate(10);
+    
+            $tasks->appends(request()->query());
+    
+            return $this->respondSuccess('نتایج جستجو با موفقیت دریافت شد', $tasks);
         } catch (\Exception $e) {
             return $this->respondInternalError('خطایی در جستجوی تسک‌ها رخ داده است');
         }

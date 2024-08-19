@@ -16,6 +16,12 @@ class Workspace extends Model
         return $this->belongsToMany(User::class, 'like');
     }
 
+    public function categories()
+    {
+        return $this->hasMany(Category::class);
+    }
+
+    
 
     protected static function newFactory()
     {

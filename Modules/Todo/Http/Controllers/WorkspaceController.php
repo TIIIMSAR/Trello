@@ -17,20 +17,24 @@ class WorkspaceController extends ApiController
      * Display a listing of the resource.
      */
     public function index(Request $request)
-    {
-        try {
-            $paginate = $request->input('paginate') ?? 10;
-            $sortColumn = $request->input('sort', 'id');
-            $sortDirection = \Illuminate\Support\Str::startsWith($sortColumn, '-') ? 'desc' : 'asc';
-            $sortColumn = ltrim($sortColumn, '-');
+{
+    try {
+        $userId = auth()->id();
 
-            $folders = Workspace::orderBy($sortColumn, $sortDirection)->simplePaginate($paginate);
-            return $this->respondSuccess('لیست پوشه‌ها با موفقیت دریافت شد', $folders);
-        } catch (\Exception $e) {
-            return $this->respondInternalError('خطایی در دریافت لیست پوشه‌ها رخ داده است');
-        }
+        $paginate = $request->input('paginate') ?? 10;
+        $sortColumn = $request->input('sort', 'id');
+        $sortDirection = \Illuminate\Support\Str::startsWith($sortColumn, '-') ? 'desc' : 'asc';
+        $sortColumn = ltrim($sortColumn, '-');
+
+        $workspaces = Workspace::where('user_id', $userId)
+            ->orderBy($sortColumn, $sortDirection)
+            ->simplePaginate($paginate);
+
+        return $this->respondSuccess('لیست پوشه‌ها با موفقیت دریافت شد', $workspaces);
+    } catch (\Exception $e) {
+        return $this->respondInternalError('خطایی در دریافت لیست پوشه‌ها رخ داده است');
     }
-
+}
     /**
      * Store a newly created resource in storage.
      */
@@ -38,9 +42,12 @@ class WorkspaceController extends ApiController
     {
         try {
             $validated = $request->validated();
-            $folder = Workspace::create($validated);
+            $workspaces = Workspace::create([
+                'name' => $validated['name'],
+                'user_id' => auth()->user()->id
+            ]);
 
-            return $this->respondCreated('پوشه با موفقیت ساخته شد', ['name' => $folder['name']]);
+            return $this->respondCreated('پوشه با موفقیت ساخته شد', ['name' => $workspaces['name']]);
         } catch (\Exception $e) {
             return $this->respondInternalError('خطایی در ایجاد پوشه رخ داده است');
         }
@@ -52,8 +59,14 @@ class WorkspaceController extends ApiController
     public function show($id)
     {
         try {
-            $folder = Workspace::findOrFail($id);
-            return $this->respondSuccess('پوشه با موفقیت پیدا شد', $folder);
+            $workspace = Workspace::findOrFail($id);
+    
+            if ($workspace->user_id !== auth()->id()) {
+                return $this->respondForbidden('شما مجاز به مشاهده این پوشه نیستید.');
+            }
+    
+            return $this->respondSuccess('پوشه با موفقیت پیدا شد', $workspace);
+    
         } catch (ModelNotFoundException $e) {
             return $this->respondNotFound('پوشه مورد نظر یافت نشد');
         } catch (\Exception $e) {
@@ -68,10 +81,17 @@ public function update(UpdateWorkspaceRequset $request, $id)
     {
         try {
             $validated = $request->validated();
-            $folder = Workspace::findOrFail($id);
-            $folder->update($validated);
-
-            return $this->respondSuccess('پوشه با موفقیت به‌روزرسانی شد', ['name' => $folder['name']]);
+    
+            $workspace = Workspace::findOrFail($id);
+    
+            if ($workspace->user_id !== auth()->id()) {
+                return $this->respondForbidden('شما مجاز به ویرایش این پوشه نیستید.');
+            }
+    
+            $workspace->update($validated);
+    
+            return $this->respondSuccess('پوشه با موفقیت به‌روزرسانی شد', ['name' => $workspace->name]);
+    
         } catch (ModelNotFoundException $e) {
             return $this->respondNotFound('پوشه مورد نظر برای به‌روزرسانی یافت نشد');
         } catch (\Exception $e) {
@@ -85,8 +105,13 @@ public function update(UpdateWorkspaceRequset $request, $id)
     public function destroy($id)
     {
         try {
-            $folder = Workspace::findOrFail($id);
-            $folder->delete();
+            $workspace = Workspace::findOrFail($id);
+    
+            if ($workspace->user_id !== auth()->id()) {
+                return $this->respondForbidden('شما مجاز به ویرایش این پوشه نیستید.');
+            }
+            
+           $workspace->delete();
 
             return $this->respondSuccess('پوشه با موفقیت پاک شد', null);
         } catch (ModelNotFoundException $e) {

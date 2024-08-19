@@ -13,8 +13,6 @@ class CreateWorkspaceRequst extends FormRequest
     {
         return [
             'name' => ['required', 'string' , 'min:3', 'max:120'],
-            'user_id' => ['required'],
-            'category_id' => ['required']
         ];
     }
 

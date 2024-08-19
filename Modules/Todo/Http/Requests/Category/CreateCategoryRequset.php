@@ -13,9 +13,6 @@ class CreateCategoryRequset extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'min:3'],
-            'category_id' => ['nullable',],
-            'workspace_id' => ['required'],
-            'user_id' => ['required'],
         ];
     }
 

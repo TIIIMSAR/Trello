@@ -17,4 +17,10 @@ class Category extends Model
     }
 
 
+    public function workspace()
+    {
+        return $this->belongsTo(Workspace::class);
+    }
+
 }
+    

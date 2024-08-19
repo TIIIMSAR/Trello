@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Modules\Todo\Entities\Category;
+use Modules\Todo\Entities\Workspace;
 use Modules\Todo\Http\Controllers\Contract\ApiController;
 use Modules\Todo\Http\Requests\Category\CreateCategoryRequset;
 use Modules\Todo\Http\Requests\Category\UpdateCategotyRequset;
@@ -16,19 +17,33 @@ class CategoryController extends ApiController
    /**
      * Display a listing of the resource.
      */
-    public function index(\Illuminate\Http\Request $request)
+    public function index(Request $request)
     {
-        // try {
+        try {
+            $workspaceId = $request->header('Workspace-Id');
+    
+            if (!$workspaceId) {
+                return response()->json(['error' => 'شناسه Workspace در هدر درخواست مشخص نشده است'], 400);
+            }
+    
+            if (!Workspace::where('id', $workspaceId)->exists()) {
+                return response()->json(['error' => 'Workspace یافت نشد'], 404);
+            }
+    
             $paginate = $request->input('paginate') ?? 10;
             $sortColumn = $request->input('sort', 'id');
             $sortDirection = \Illuminate\Support\Str::startsWith($sortColumn, '-') ? 'desc' : 'asc';
             $sortColumn = ltrim($sortColumn, '-');
-
-            $categories = Category::with('tasks')->orderBy($sortColumn, $sortDirection)->simplePaginate($paginate);
+    
+            $categories = Category::with('tasks')
+                                  ->where('workspace_id', $workspaceId)
+                                  ->orderBy($sortColumn, $sortDirection)
+                                  ->simplePaginate($paginate);
+    
             return $this->respondSuccess('لیست دسته‌بندی‌ها با موفقیت دریافت شد', $categories);
-        // } catch (\Exception $e) {
-        //     return $this->respondInternalError('خطایی در دریافت لیست دسته‌بندی‌ها رخ داده است');
-        // }
+        } catch (\Exception $e) {
+            return $this->respondInternalError('خطایی در دریافت لیست دسته‌بندی‌ها رخ داده است');
+        }
     }
 
     /**
@@ -36,27 +51,50 @@ class CategoryController extends ApiController
      */
     public function store(CreateCategoryRequset $request)
     {
-        
-        // try {
-            $validated = $request->validated();
-            $category = Category::create($validated);
+        try {
+            $workspaceId = $request->header('workspace_id');
 
-            return $this->respondCreated('دسته‌بندی با موفقیت ساخته شد', ['name' => $category['name']]);
-        // } catch (\Exception $e) {
-        //     return $this->respondInternalError('خطایی در ایجاد دسته‌بندی رخ داده است');
-        // }
+            if (!$workspaceId) {
+                return response()->json(['error' => 'شناسه Workspace در هدر درخواست مشخص نشده است'], 400);
+            }
+    
+            $workspace = Workspace::where('id', $workspaceId)
+                                  ->where('user_id', auth()->id())
+                                  ->firstOrFail();
+    
+            $category = Category::create([
+                'name' => $request->input('name'),
+                'workspace_id' => $workspace->id,
+            ]);
+    
+            return $this->respondCreated('دسته‌بندی با موفقیت ساخته شد', ['name' => $category->name]);
+    
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return $this->respondNotFound('Workspace معتبر پیدا نشد یا به کاربر تعلق ندارد');
+        } catch (\Exception $e) {
+            return $this->respondInternalError('خطایی در ایجاد دسته‌بندی رخ داده است');
+        }
     }
 
     /**
      * Show the specified resource.
      */
-    public function show($id)
+    public function show($id, Request $request)
     {
         try {
-            $category = Category::findOrFail($id);
+            $workspaceId = $request->header('workspace_id');
+    
+            if (!$workspaceId) {
+                return response()->json(['error' => 'شناسه Workspace در هدر درخواست مشخص نشده است'], 400);
+            }
+    
+            $category = Category::where('id', $id)
+                                ->where('workspace_id', $workspaceId)
+                                ->firstOrFail();
+    
             return $this->respondSuccess('دسته‌بندی با موفقیت پیدا شد', $category);
         } catch (ModelNotFoundException $e) {
-            return $this->respondNotFound('دسته‌بندی مورد نظر یافت نشد');
+            return $this->respondNotFound('دسته‌بندی مورد نظر یافت نشد یا به Workspace مربوطه تعلق ندارد');
         } catch (\Exception $e) {
             return $this->respondInternalError('خطایی در نمایش اطلاعات دسته‌بندی رخ داده است');
         }
@@ -68,13 +106,22 @@ class CategoryController extends ApiController
     public function update(UpdateCategotyRequset $request, $id)
     {
         try {
+            $workspaceId = $request->header('workspace_id');
+    
+            if (!$workspaceId) {
+                return response()->json(['error' => 'شناسه Workspace در هدر درخواست مشخص نشده است'], 400);
+            }
+    
+            $category = Category::where('id', $id)
+                                ->where('workspace_id', $workspaceId)
+                                ->firstOrFail();
+    
             $validated = $request->validated();
-            $category = Category::findOrFail($id);
             $category->update($validated);
-
-            return $this->respondSuccess('دسته‌بندی با موفقیت به‌روزرسانی شد', ['slug' => $category['slug']]);
+    
+            return $this->respondSuccess('دسته‌بندی با موفقیت به‌روزرسانی شد', ['name' => $category->name]);
         } catch (ModelNotFoundException $e) {
-            return $this->respondNotFound('دسته‌بندی مورد نظر برای به‌روزرسانی یافت نشد');
+            return $this->respondNotFound('دسته‌بندی مورد نظر یافت نشد یا به Workspace مربوطه تعلق ندارد');
         } catch (\Exception $e) {
             return $this->respondInternalError('خطایی در به‌روزرسانی دسته‌بندی رخ داده است');
         }
@@ -83,17 +130,27 @@ class CategoryController extends ApiController
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy($id, Request $request)
     {
         try {
-            $category = Category::findOrFail($id);
+            $workspaceId = $request->header('Workspace-Id');
+    
+            if (!$workspaceId) {
+                return response()->json(['error' => 'شناسه Workspace در هدر درخواست مشخص نشده است'], 400);
+            }
+    
+            $category = Category::where('id', $id)
+                                ->where('workspace_id', $workspaceId)
+                                ->firstOrFail();
+    
             $category->delete();
-
+    
             return $this->respondSuccess('دسته‌بندی با موفقیت حذف شد', null);
         } catch (ModelNotFoundException $e) {
-            return $this->respondNotFound('دسته‌بندی مورد نظر برای حذف یافت نشد');
+            return $this->respondNotFound('دسته‌بندی مورد نظر یافت نشد یا به Workspace مربوطه تعلق ندارد');
         } catch (\Exception $e) {
             return $this->respondInternalError('خطایی در حذف دسته‌بندی رخ داده است');
         }
     }
+    
 }

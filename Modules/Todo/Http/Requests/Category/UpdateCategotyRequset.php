@@ -13,8 +13,6 @@ class UpdateCategotyRequset extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'min:3'],
-            'category_id' => ['nullable',],
-            'user_id' => ['required'],
         ];
     }
 
