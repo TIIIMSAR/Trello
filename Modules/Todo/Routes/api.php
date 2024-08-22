@@ -5,12 +5,14 @@ use Illuminate\Support\Facades\Route;
 use Modules\Todo\Entities\User;
 use Modules\Todo\Http\Controllers\AuthController;
 use Modules\Todo\Http\Controllers\CategoryController;
+use Modules\Todo\Http\Controllers\LandingPageController;
 use Modules\Todo\Http\Controllers\LikeTaskController;
 use Modules\Todo\Http\Controllers\PasswordResetController;
 use Modules\Todo\Http\Controllers\SearchController;
 use Modules\Todo\Http\Controllers\TaskController;
 use Modules\Todo\Http\Controllers\UserController;
 use Modules\Todo\Http\Controllers\WorkspaceController;
+
 
 
 
@@ -43,6 +45,10 @@ use Modules\Todo\Http\Controllers\WorkspaceController;
             Route::get('', [UserController::class, 'index']);
             Route::get('/{id}', [UserController::class, 'show']);
             Route::put('/{id}', [UserController::class, 'update']);
+        });
+
+        Route::group(['prefix' => '/landing'], function () {
+            Route::get('/{workspace_id}', [LandingPageController::class, 'index']);
         });
     
         Route::group(['prefix' => '/tasks'], function () {

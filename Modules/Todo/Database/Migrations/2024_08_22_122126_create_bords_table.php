@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateLikeTable extends Migration
+class CreateBordsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,10 @@ class CreateLikeTable extends Migration
      */
     public function up()
     {
-        Schema::create('like', function (Blueprint $table) {
+        Schema::create('bords', function (Blueprint $table) {
             $table->id();
-            
+            $table->string('name');
+
             $table->foreignId('workspace_id')
             ->constrained()
             ->onDelete('cascade')
@@ -32,6 +33,6 @@ class CreateLikeTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('like');
+        Schema::dropIfExists('bords');
     }
 }
