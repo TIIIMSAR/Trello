@@ -177,4 +177,10 @@ class TaskController extends ApiController
             return $this->respondInternalError('خطایی در حذف تسک رخ داده است');
         }
     }
+
+
+    public function fallback()
+    {
+        return response()->json('!ادرس شناسایی نشد لطفا دقت کنید', 404);
+    }
 }

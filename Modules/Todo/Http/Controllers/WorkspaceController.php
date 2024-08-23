@@ -30,9 +30,9 @@ class WorkspaceController extends ApiController
             ->orderBy($sortColumn, $sortDirection)
             ->simplePaginate($paginate);
 
-        return $this->respondSuccess('لیست پوشه‌ها با موفقیت دریافت شد', $workspaces);
+        return $this->respondSuccess('لیست میزکار با موفقیت دریافت شد', $workspaces);
     } catch (\Exception $e) {
-        return $this->respondInternalError('خطایی در دریافت لیست پوشه‌ها رخ داده است');
+        return $this->respondInternalError('خطایی در دریافت لیست میزکار رخ داده است');
     }
 }
     /**
@@ -47,9 +47,9 @@ class WorkspaceController extends ApiController
                 'user_id' => auth()->user()->id
             ]);
 
-            return $this->respondCreated('پوشه با موفقیت ساخته شد', ['name' => $workspaces['name']]);
+            return $this->respondCreated('میزکار با موفقیت ساخته شد', ['name' => $workspaces['name']]);
         } catch (\Exception $e) {
-            return $this->respondInternalError('خطایی در ایجاد پوشه رخ داده است');
+            return $this->respondInternalError('خطایی در ایجاد میزکار رخ داده است');
         }
     }
 
@@ -62,15 +62,15 @@ class WorkspaceController extends ApiController
             $workspace = Workspace::findOrFail($id);
     
             if ($workspace->user_id !== auth()->id()) {
-                return $this->respondForbidden('شما مجاز به مشاهده این پوشه نیستید.');
+                return $this->respondForbidden('شما مجاز به مشاهده این میزکار نیستید.');
             }
     
-            return $this->respondSuccess('پوشه با موفقیت پیدا شد', $workspace);
+            return $this->respondSuccess('میزکار با موفقیت پیدا شد', $workspace);
     
         } catch (ModelNotFoundException $e) {
-            return $this->respondNotFound('پوشه مورد نظر یافت نشد');
+            return $this->respondNotFound('میزکار مورد نظر یافت نشد');
         } catch (\Exception $e) {
-            return $this->respondInternalError('خطایی در نمایش اطلاعات پوشه رخ داده است');
+            return $this->respondInternalError('خطایی در نمایش اطلاعات میزکار رخ داده است');
         }
     }
 
@@ -85,17 +85,17 @@ public function update(UpdateWorkspaceRequset $request, $id)
             $workspace = Workspace::findOrFail($id);
     
             if ($workspace->user_id !== auth()->id()) {
-                return $this->respondForbidden('شما مجاز به ویرایش این پوشه نیستید.');
+                return $this->respondForbidden('شما مجاز به ویرایش این میزکار نیستید.');
             }
     
             $workspace->update($validated);
     
-            return $this->respondSuccess('پوشه با موفقیت به‌روزرسانی شد', ['name' => $workspace->name]);
+            return $this->respondSuccess('میزکار با موفقیت به‌روزرسانی شد', ['name' => $workspace->name]);
     
         } catch (ModelNotFoundException $e) {
-            return $this->respondNotFound('پوشه مورد نظر برای به‌روزرسانی یافت نشد');
+            return $this->respondNotFound('میزکار مورد نظر برای به‌روزرسانی یافت نشد');
         } catch (\Exception $e) {
-            return $this->respondInternalError('خطایی در به‌روزرسانی پوشه رخ داده است');
+            return $this->respondInternalError('خطایی در به‌روزرسانی میزکار رخ داده است');
         }
     }
 
@@ -108,16 +108,16 @@ public function update(UpdateWorkspaceRequset $request, $id)
             $workspace = Workspace::findOrFail($id);
     
             if ($workspace->user_id !== auth()->id()) {
-                return $this->respondForbidden('شما مجاز به ویرایش این پوشه نیستید.');
+                return $this->respondForbidden('شما مجاز به ویرایش این میزکار نیستید.');
             }
             
            $workspace->delete();
 
-            return $this->respondSuccess('پوشه با موفقیت پاک شد', null);
+            return $this->respondSuccess('میزکار با موفقیت پاک شد', null);
         } catch (ModelNotFoundException $e) {
-            return $this->respondNotFound('پوشه مورد نظر برای حذف یافت نشد');
+            return $this->respondNotFound('میزکار مورد نظر برای حذف یافت نشد');
         } catch (\Exception $e) {
-            return $this->respondInternalError('خطایی در حذف پوشه رخ داده است');
+            return $this->respondInternalError('خطایی در حذف میزکار رخ داده است');
         }
     }
 }

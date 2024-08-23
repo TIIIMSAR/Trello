@@ -15,7 +15,7 @@ class ApiController extends Controller
  
     public function respondInternalError(string $message)
     {
-        return $this->setStatusCode(500)->respond($message, true);
+        return $this->setStatusCode(500)->respond($message, false);
     }
 
     public function respondNotFound(string $message)

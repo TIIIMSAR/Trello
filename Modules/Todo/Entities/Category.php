@@ -16,10 +16,9 @@ class Category extends Model
         return $this->hasMany(Task::class);
     }
 
-
-    public function workspace()
+    protected function bord()
     {
-        return $this->belongsTo(Workspace::class);
+        return $this->belongsTo(Bord::class);
     }
 
 }

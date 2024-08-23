@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Modules\Todo\Entities\User;
 use Modules\Todo\Http\Controllers\AuthController;
+use Modules\Todo\Http\Controllers\BordController;
 use Modules\Todo\Http\Controllers\CategoryController;
 use Modules\Todo\Http\Controllers\LandingPageController;
 use Modules\Todo\Http\Controllers\LikeTaskController;
@@ -12,9 +13,6 @@ use Modules\Todo\Http\Controllers\SearchController;
 use Modules\Todo\Http\Controllers\TaskController;
 use Modules\Todo\Http\Controllers\UserController;
 use Modules\Todo\Http\Controllers\WorkspaceController;
-
-
-
 
 
 
@@ -39,16 +37,16 @@ use Modules\Todo\Http\Controllers\WorkspaceController;
     Route::post('/password/email', [PasswordResetController::class, 'sendResetLinkEmail']);
     Route::post('/password/reset', [PasswordResetController::class, 'resetPassword']);
 
+    Route::get('/users', [UserController::class, 'index']);
 
     Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::group(['prefix' => '/users'], function () {
-            Route::get('', [UserController::class, 'index']);
             Route::get('/{id}', [UserController::class, 'show']);
             Route::put('/{id}', [UserController::class, 'update']);
         });
 
         Route::group(['prefix' => '/landing'], function () {
-            Route::get('/{workspace_id}', [LandingPageController::class, 'index']);
+            Route::get('/{bord_id}', [LandingPageController::class, 'index']);
         });
     
         Route::group(['prefix' => '/tasks'], function () {
@@ -65,6 +63,14 @@ use Modules\Todo\Http\Controllers\WorkspaceController;
             Route::post('', [WorkspaceController::class, 'store']);
             Route::put('/{id}', [WorkspaceController::class, 'update']);
             Route::delete('/{id}', [WorkspaceController::class, 'destroy']);
+        });
+    
+    
+        Route::group(['prefix' => '/bord'] ,function () {
+            Route::get('/{wprkspace_id}', [BordController::class, 'index']);
+            Route::post('', [BordController::class, 'store']);
+            Route::put('/{id}', [BordController::class, 'update']);
+            Route::delete('/{id}/workspace/{workspace:id}', [BordController::class, 'destroy']);
         });
     
         Route::group(['prefix' => 'category'], function () {
