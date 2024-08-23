@@ -65,7 +65,7 @@ use Modules\Todo\Http\Controllers\WorkspaceController;
             Route::delete('/{id}', [WorkspaceController::class, 'destroy']);
         });
     
-    
+         
         Route::group(['prefix' => '/bord'] ,function () {
             Route::get('/{wprkspace_id}', [BordController::class, 'index']);
             Route::post('', [BordController::class, 'store']);

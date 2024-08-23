@@ -30,4 +30,19 @@ class CreateUserRequset extends FormRequest
     {
         return true;
     }
+
+    protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
+    {
+        $errors = $validator->errors()->all();
+        $firstError = $errors[0] ?? 'خطایی رخ داد';
+
+        throw new \Illuminate\Validation\ValidationException(
+            $validator,
+            response()->json([
+                'success' => false,
+                'message' => 'ورودی‌های شما معتبر نیستند. ' . $firstError,
+                'errors' => $errors,
+            ], 422)
+        );
+    }
 }

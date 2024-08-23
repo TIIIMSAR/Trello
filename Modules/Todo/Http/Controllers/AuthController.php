@@ -8,7 +8,9 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;    
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Modules\Todo\Entities\User;
 use Modules\Todo\Http\Controllers\Contract\ApiController;
@@ -19,29 +21,35 @@ class AuthController extends ApiController
 {
       public function register(CreateUserRequset $request)
       {
-         $file =  $request->file('image_path');
-                    if(!empty($file)){
-                        $image_naem = time() . rand(100,10000) . '.' . $file->getClientOriginalExtension();
-                        $file->move('images/UserProfile', $image_naem);
-                        $validated['image'] = $image_naem;
-                    }
-            try{    
-                $request['password'] = Hash::make($request->password);
-                    
-                $user = User::create([
-                    'name' => $request['name'],
-                    'email' => $request['email'],
-                    'password' => $request['password'],
-                ]);
-                    
-                $token = $user->createToken('Personal Access Token')->plainTextToken;
-                return $this->respondCreated('کاربر با موفقیت ایجاد شد', [
-                    'user' => $user,
-                    'token' => $token,
-                ]);
-            } catch (\Exception $e) {
-                return $this->respondInternalError('(ایمیل باید یونیک باشد):خطایی در ایجاد کاربر رخ داده است');
+        $validated = $request->validated();
+    
+        try {
+            $userId = User::max('id') + 1; 
+
+            if ($request->hasFile('image_path')) {
+                $imageName = $this->storePhoto($request->file('image_path'), $userId);
+                $validated['image_path'] = $imageName;
             }
+    
+    
+            $validated['password'] = Hash::make($validated['password']);
+            $user = User::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => $validated['password'],
+                'image_path' => $validated['image_path'], 
+            ]);
+            
+            $token = $user->createToken('Personal Access Token')->plainTextToken;
+            
+            return $this->respondCreated('کاربر با موفقیت ایجاد شد', [
+                'user' => $user,
+                'token' => $token,
+            ]);
+            
+        } catch (\Exception $e) {
+            return $this->respondInternalError('(ایمیل باید یونیک باشد):خطایی در ایجاد کاربر رخ داده است');
+        }
       }
   
 
@@ -76,10 +84,19 @@ class AuthController extends ApiController
     {
         try {
             $user = User::findOrFail($id);
+    
+            if ($user->id !== auth()->id()) {
+                return $this->respondInternalError('شما مجاز به حذف این حساب کاربری نیستید.');
+            }
+    
+            $this->deleteUserPhotos($user);
+    
             $user->tokens()->delete();
+    
             $user->delete();
-
+    
             return $this->respondSuccess('کاربر با موفقیت حذف شد', null);
+    
         } catch (ModelNotFoundException $e) {
             return $this->respondNotFound('کاربر مورد نظر برای حذف یافت نشد');
         } catch (\Exception $e) {
@@ -87,5 +104,30 @@ class AuthController extends ApiController
         }
     }
 
+    // image User Profile
+    protected function storePhoto($file, $userId)
+    {
+        $imageName = time() . rand(100, 10000) . '.' . $file->getClientOriginalExtension();
+    
+        $userFolderPath = public_path('images/UserProfile/' . $userId);
+    
+        if (!File::exists($userFolderPath)) {
+            File::makeDirectory($userFolderPath, 0755, true);
+        }
+    
+        $file->move($userFolderPath, $imageName);
+    
+        return $imageName;
+    }
 
-}
+
+    protected function deleteUserPhotos(User $user)
+    {
+        $userFolderPath = public_path('images/UserProfile/' . $user->id);
+    
+        if (File::exists($userFolderPath)) {
+            File::deleteDirectory($userFolderPath);
+        }
+    }
+}   
+

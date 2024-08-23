@@ -12,10 +12,9 @@ class UpdateUserRequset extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['nullable', 'string', 'min:3', 'max:256'],
-            'email' => ['nullable', 'email'],
-            'profile_path' => ['nullable', 'file', 'mimes:jpg,jpeg,png,gif'],
-            'password' => ['nullable'],
+            'email' => ['required', 'string', 'email'],
+            'password' => ['required', 'string'],
+            'name' => ['nullable', 'min:3', 'max:256', 'string']
         ];
     }
 
