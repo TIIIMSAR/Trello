@@ -66,7 +66,7 @@ use Modules\Todo\Http\Controllers\WorkspaceController;
         });
     
          
-        Route::group(['prefix' => '/bord'] ,function () {
+        Route::group(['prefix' => '/board'] ,function () {
             Route::get('/{wprkspace_id}', [BordController::class, 'index']);
             Route::post('', [BordController::class, 'store']);
             Route::put('/{id}', [BordController::class, 'update']);
@@ -74,9 +74,9 @@ use Modules\Todo\Http\Controllers\WorkspaceController;
         });
     
         Route::group(['prefix' => 'category'], function () {
-            Route::get('', [CategoryController::class, 'index']);
-            Route::get('/{id}', [CategoryController::class, 'show']);
-            Route::delete('/{id}', [CategoryController::class, 'destroy']);
+            Route::get('/{board}', [CategoryController::class, 'index']);
+            Route::get('/{id}/board/{board}', [CategoryController::class, 'show']);
+            Route::delete('/{id}/board/{board:id}', [CategoryController::class, 'destroy']);
             Route::post('', [CategoryController::class, 'store']);
             Route::put('/{id}', [CategoryController::class, 'update']);
         });

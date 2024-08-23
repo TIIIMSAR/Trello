@@ -13,6 +13,7 @@ class CreateCategoryRequset extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'min:3'],
+            'board_id' => ['required']
         ];
     }
 

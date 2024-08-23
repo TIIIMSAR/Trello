@@ -10,6 +10,7 @@ class Workspace extends Model
         'id'
     ];
 
+
     
     public function likes()
     {
@@ -21,6 +22,10 @@ class Workspace extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function boards()
+    {
+        return $this->hasMany(Bord::class);
+    }
 
     protected static function newFactory()
     {

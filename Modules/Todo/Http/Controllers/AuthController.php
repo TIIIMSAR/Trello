@@ -39,7 +39,7 @@ class AuthController extends ApiController
                 'password' => $validated['password'],
                 'image_path' => $validated['image_path'], 
             ]);
-            
+
             $token = $user->createToken('Personal Access Token')->plainTextToken;
             
             return $this->respondCreated('کاربر با موفقیت ایجاد شد', [
@@ -54,7 +54,7 @@ class AuthController extends ApiController
   
 
 
-      public function login(Request $request)
+    public function login(Request $request)
 {
     $validator = Validator::make($request->all(), [
         'email' => 'required|string|email',

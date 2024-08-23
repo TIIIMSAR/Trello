@@ -16,10 +16,7 @@ class Category extends Model
         return $this->hasMany(Task::class);
     }
 
-    protected function bord()
-    {
-        return $this->belongsTo(Bord::class);
-    }
+   
 
 }
     
