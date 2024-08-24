@@ -49,7 +49,7 @@ use Modules\Todo\Http\Controllers\WorkspaceController;
         });
 
         Route::group(['prefix' => '/landing'], function () {
-            Route::get('/{bord_id}', [LandingPageController::class, 'index']);
+            Route::get('/{bord}', [LandingPageController::class, 'index']);
         });
     
         Route::group(['prefix' => '/tasks'], function () {

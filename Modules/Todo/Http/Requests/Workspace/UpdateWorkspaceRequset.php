@@ -13,8 +13,6 @@ class UpdateWorkspaceRequset extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:120', 'min:3'],
-            'user_id' => ['nullable'],
-            'categoey_id' => ['nullable']
         ];
     }
 

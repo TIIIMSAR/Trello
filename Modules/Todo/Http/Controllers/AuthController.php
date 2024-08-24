@@ -85,9 +85,9 @@ class AuthController extends ApiController
         try {
             $user = User::findOrFail($id);
     
-            if ($user->id !== auth()->id()) {
-                return $this->respondInternalError('شما مجاز به حذف این حساب کاربری نیستید.');
-            }
+            // if ($user->id !== auth()->id()) {
+            //     return $this->respondInternalError('شما مجاز به حذف این حساب کاربری نیستید.');
+            // }
     
             $this->deleteUserPhotos($user);
     
