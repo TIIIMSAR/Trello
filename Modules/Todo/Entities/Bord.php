@@ -21,5 +21,10 @@ class Bord extends Model
         return $this->belongsTo(Workspace::class);
     }
 
+    public function likes()
+    {
+        return $this->belongsToMany(User::class, 'like', 'bord_id', 'users_id')->withTimestamps();
+    }
+
 
 }

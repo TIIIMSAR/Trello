@@ -6,6 +6,7 @@ use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Modules\Todo\Entities\Bord;
 use Modules\Todo\Entities\Category;
 use Modules\Todo\Entities\Task;
 use Modules\Todo\Entities\User;
@@ -17,40 +18,30 @@ class LikeTaskController extends ApiController
     /**
      * Toggle the like for a task.  
      */
-    public function index(Request $request)
-    {
-        // try {
-            $workspaceId = $request->header('workspace_id');
-    
-            if (!$workspaceId) {
-                return $this->respondInternalError('workspace_id در هدر درخواست وجود ندارد');
-            }
-    
-            $categories = Category::where('workspace_id', $workspaceId)->pluck('id');
-    
-            if ($categories->isEmpty()) {
-                return $this->respondNotFound('هیچ دسته‌بندی‌ای برای workspace_id مشخص شده پیدا نشد');
-            }
+public function index(Request $request)
+{
+    // try {
+        $boardId = $request->input('board_id');
 
-            $user = Workspace::whereIn('user_id', $categories)->get();
-    
-            if ($user->isEmpty()) {
-                return $this->respondNotFound('هیچ تسکی برای دسته‌بندی‌های مشخص شده پیدا نشد');
-            }
-    
-            $userId = auth()->user()->id;
-            foreach ($user as $task) {
-                $task->likes()->toggle([$userId]);
-            }
-    
-            $likesCount = $user->sum(function ($task) {
-                return $task->likes()->count();
-            });
-    
-            return $this->respondSuccess('لایک‌ها با موفقیت تغییر کرد', ['likes_count' => $likesCount]);
-        // } catch (\Exception $e) {
-        //     return $this->respondInternalError('خطایی در تغییر وضعیت لایک رخ داده است');
-        // }
-        
+    if (!$boardId) {
+        return $this->respondInternalError('board_id در بدنه درخواست وجود ندارد');
+    }
+
+    $board = Bord::find($boardId);
+
+    if (!$board) {
+        return $this->respondNotFound('بورد مورد نظر یافت نشد');
+    }
+
+    $userId = auth()->user()->id;
+
+    $board->likes()->toggle([$userId]);
+
+    $likesCount = $board->likes()->count();
+
+    return $this->respondSuccess('لایک بورد با موفقیت تغییر کرد', ['likes_count' => $likesCount]);    
+    // } catch (\Exception $e) {
+    //     return $this->respondInternalError('خطایی در تغییر وضعیت لایک رخ داده است');
+    // }
     }
 }
