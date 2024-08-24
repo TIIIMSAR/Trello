@@ -12,11 +12,9 @@ class UpdateTaskRequst extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => ['nullable', 'string', 'min:3', 'max:120'],
+            'title' => ['required', 'string', 'min:3', 'max:120'],
             'body' => ['nullable', 'string', 'min:3', 'max:1024'],
-            'status' => ['nullable'],
-            'user_id' => ['nullable', 'integer'],
-            'category_id' => ['nullable', 'integer']
+            'category_id' => ['required', 'integer']
         ];
     }
 

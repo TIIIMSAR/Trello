@@ -20,6 +20,11 @@ class CreateLikeTable extends Migration
             ->constrained()
             ->onDelete('cascade')
             ->onUpdate('cascade');
+            
+            $table->foreignId('workspace_id')
+            ->constrained()
+            ->onDelete('cascade')
+            ->onUpdate('cascade');
 
             $table->timestamps();
         });

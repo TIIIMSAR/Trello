@@ -6,6 +6,7 @@ use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Modules\Todo\Entities\Bord;
 use Modules\Todo\Entities\Task;
 use Modules\Todo\Entities\Workspace;
 use Modules\Todo\Http\Controllers\Contract\ApiController;
@@ -15,19 +16,17 @@ class SearchController extends ApiController
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index($boardId, Request $request)
     {
         try {
-            $workspaceId = $request->header('workspace_id');
+            $board = Bord::find($boardId);
     
-            $workspace = Workspace::find($workspaceId);
-    
-            if (!$workspace) {
-                return response()->json(['error' => 'فضای کاری مورد نظر یافت نشد'], 404);
+            if (!$board) {
+                return response()->json(['error' => 'بورد مورد نظر یافت نشد'], 404);
             }
     
-            $categoryIds = $workspace->categories()->pluck('id');
-            
+            $categoryIds = $board->categories()->pluck('id');
+    
             $searchTerm = $request->query('search', '');
     
             $tasks = Task::whereIn('category_id', $categoryIds)

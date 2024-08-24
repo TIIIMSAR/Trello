@@ -14,6 +14,7 @@ class CreateTaskRequst extends FormRequest
         return [
             'title' => ['required', 'string', 'min:3', 'max:120'],
             'body' => ['required', 'string', 'min:3', 'max:1024'],
+            'category_id' => ['required']
         ];
     }
 

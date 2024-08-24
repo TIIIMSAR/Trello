@@ -26,8 +26,11 @@ use Modules\Todo\Http\Controllers\WorkspaceController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-    Route::fallback([TaskController::class, 'fallback']);
-    Route::get('/search', [SearchController::class, 'index'])->middleware('auth:sanctum');
+    Route::fallback(function(){
+        return response()->json('ادرس درست وارد نشده است');
+    });
+
+    Route::get('/search/board/{board}', [SearchController::class, 'index'])->middleware('auth:sanctum');
     Route::post('like/{workspace:name}', [LikeTaskController::class, 'index'])->middleware('auth:sanctum'); 
 
     Route::post('/register', [AuthController::class, 'register']);
@@ -50,11 +53,11 @@ use Modules\Todo\Http\Controllers\WorkspaceController;
         });
     
         Route::group(['prefix' => '/tasks'], function () {
-            Route::get('', [TaskController::class, 'index']);
-            Route::get('/{id}', [TaskController::class, 'show']);
+            Route::get('/{category}', [TaskController::class, 'index']);
+            Route::get('/{id}/category/{category}', [TaskController::class, 'show']);
             Route::post('', [TaskController::class, 'store']);
             Route::put('/{id}', [TaskController::class, 'update']);
-            Route::delete('/{id}', [TaskController::class, 'destroy']);
+            Route::delete('/{id}/category/{category}', [TaskController::class, 'destroy']);
         });
     
         Route::group(['prefix' => '/workspace'] ,function () {
