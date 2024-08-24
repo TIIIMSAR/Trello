@@ -27,6 +27,11 @@ class Workspace extends Model
         return $this->hasMany(Bord::class);
     }
 
+    public function categories()
+    {
+        return $this->hasManyThrough(Category::class, Bord::class, 'workspace_id', 'bord_id');
+    }
+
     protected static function newFactory()
     {
         //return FolderFactory::new();

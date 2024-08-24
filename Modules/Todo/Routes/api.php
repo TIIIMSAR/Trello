@@ -31,7 +31,7 @@ use Modules\Todo\Http\Controllers\WorkspaceController;
     });
 
     Route::get('/search/board/{board}', [SearchController::class, 'index'])->middleware('auth:sanctum');
-    Route::post('like/{workspace:name}', [LikeTaskController::class, 'index'])->middleware('auth:sanctum'); 
+    Route::post('like/{bord:name}', [LikeTaskController::class, 'index'])->middleware('auth:sanctum'); 
 
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);

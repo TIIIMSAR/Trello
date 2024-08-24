@@ -19,7 +19,7 @@ class LikeTaskController extends ApiController
      */
     public function index(Request $request)
     {
-        try {
+        // try {
             $workspaceId = $request->header('workspace_id');
     
             if (!$workspaceId) {
@@ -48,9 +48,9 @@ class LikeTaskController extends ApiController
             });
     
             return $this->respondSuccess('لایک‌ها با موفقیت تغییر کرد', ['likes_count' => $likesCount]);
-        } catch (\Exception $e) {
-            return $this->respondInternalError('خطایی در تغییر وضعیت لایک رخ داده است');
-        }
+        // } catch (\Exception $e) {
+        //     return $this->respondInternalError('خطایی در تغییر وضعیت لایک رخ داده است');
+        // }
         
     }
 }

@@ -25,15 +25,17 @@ class SearchController extends ApiController
                 return response()->json(['error' => 'بورد مورد نظر یافت نشد'], 404);
             }
     
-            $categoryIds = $board->categories()->pluck('id');
+            $categoryIds = $board->categories->pluck('id');
     
             $searchTerm = $request->query('search', '');
     
             $tasks = Task::whereIn('category_id', $categoryIds)
-                ->where('title', 'LIKE', "%{$searchTerm}%")
+                ->when(!empty($searchTerm), function($query) use ($searchTerm) {
+                    $query->where('title', 'LIKE', "%{$searchTerm}%");
+                })
                 ->simplePaginate(10);
     
-            $tasks->appends(request()->query());
+            $tasks->appends($request->query());
     
             return $this->respondSuccess('نتایج جستجو با موفقیت دریافت شد', $tasks);
         } catch (\Exception $e) {

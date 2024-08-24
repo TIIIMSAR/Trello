@@ -16,15 +16,16 @@ class CreateLikeTable extends Migration
         Schema::create('like', function (Blueprint $table) {
             $table->id();
             
-            $table->foreignId('workspace_id')
+            $table->foreignId('bord_id')
             ->constrained()
             ->onDelete('cascade')
             ->onUpdate('cascade');
             
-            $table->foreignId('workspace_id')
+            $table->foreignId('users_id')
             ->constrained()
             ->onDelete('cascade')
             ->onUpdate('cascade');
+
 
             $table->timestamps();
         });
